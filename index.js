@@ -1,0 +1,148 @@
+/**
+ * Constants
+ */
+
+const MINUTE_HEIGHT = 30 / 24; // 24px is 30 minutes
+const EVENT_BORDER_SIZE = 2; // there is 2px of gap at the bottom of each event
+const MINUTES_PER_DAY = 7 * 60; // 7 hours in a day of work
+const NOT_ACCEPTED_YET_MEETINGS_COLOR = "rgb(255, 255, 255)";
+
+/**
+ * i18n utils
+ */
+const language = navigator.language;
+const translations = {
+  fr: {
+    title: "Temps passé",
+    day: "j"
+  },
+  en: {
+    title: "Time spent",
+    day: "d"
+  }
+};
+
+const i18n = {
+  t: key => {
+    if (translations.hasOwnProperty(language)) {
+      return translations[language][key];
+    }
+    return translations.en[key];
+  }
+};
+
+init = () => {
+  /**
+   * Build table with time details
+   */
+  const table = document.createElement("ul");
+  table.style.paddingLeft = "28px";
+  table.style.margin = "4px 0px 8px";
+
+  const title = document.createElement("div");
+  title.style.margin = "20px 20px 8px 28px";
+  title.style.display = "flex";
+  title.style.alignItems = "center";
+
+  const titleText = document.createElement("span");
+  titleText.textContent = i18n.t("title");
+  titleText.style.flexGrow = "1";
+  titleText.style.fontFamily = "'Google Sans',Roboto,Arial,sans-serif";
+  titleText.style.fontSize = "14px";
+  titleText.style.fontWeight = "500";
+  titleText.style.letterSpacing = ".25px";
+  titleText.style.lineHeight = "16px";
+  titleText.style.color = "#3c4043";
+  title.appendChild(titleText);
+
+  /**
+   * Insert table
+   */
+  const meetingWithSearchBox = document.querySelectorAll("[role=search]")[0];
+  meetingWithSearchBox.parentNode.insertBefore(title, meetingWithSearchBox);
+  meetingWithSearchBox.parentNode.insertBefore(table, meetingWithSearchBox);
+
+  const computeData = () => {
+    table.textContent = "";
+    /**
+     * Compute data
+     */
+    const events = document.querySelectorAll("[data-eventchip]");
+
+    const colorEvents = {};
+
+    events.forEach(event => {
+      let eventColor =
+        event.style.backgroundColor || NOT_ACCEPTED_YET_MEETINGS_COLOR;
+
+      if (!colorEvents[eventColor]) colorEvents[eventColor] = [];
+      colorEvents[eventColor].push(event);
+    });
+
+    const getTimeFromEventSize = event =>
+      (parseInt(event.style.height.replace("px", "") || 0) +
+        EVENT_BORDER_SIZE) *
+      MINUTE_HEIGHT;
+
+    formatTime = time =>
+      `${time >= 60 ? `${Math.trunc(time / 60)}h` : ""}${
+        time % 60 !== 0 ? `${time % 60}m` : ""
+      } (${(time / MINUTES_PER_DAY).toLocaleString(language, {
+        maximumFractionDigits: 1
+      })}${i18n.t("day")})`;
+
+    const colors = Object.keys(colorEvents).map(color => ({
+      color: color,
+      time: formatTime(
+        colorEvents[color].reduce((time, event) => {
+          return time + getTimeFromEventSize(event);
+        }, 0)
+      )
+    }));
+
+    /**
+     * Add elements for each color
+     */
+    colors.forEach(color => {
+      const item = document.createElement("li");
+      item.style.display = "flex";
+      item.style.alignItems = "center";
+      item.style.marginBottom = "12px";
+
+      const colorDot = document.createElement("span");
+      colorDot.style.display = "inline-block";
+      colorDot.style.height = "20px";
+      colorDot.style.width = "20px";
+      colorDot.style.borderRadius = "20px";
+      colorDot.style.backgroundColor = color.color;
+      colorDot.style.marginRight = "8px";
+      if (color.color === NOT_ACCEPTED_YET_MEETINGS_COLOR)
+        colorDot.style.border = "1px solid black";
+
+      const text = document.createElement("span");
+      text.style.color = "#3c4043";
+      text.style.fontSize = "14px";
+      text.style.fontWeight = "400";
+      text.style.lineHeight = "16px";
+      text.style.fontFamily = "Roboto,Helvetica,Arial,sans-serif";
+      text.textContent = color.time;
+
+      item.appendChild(colorDot);
+      item.appendChild(text);
+      table.appendChild(item);
+    });
+  };
+
+  setInterval(computeData, 500);
+};
+
+/**
+ * We try to init every half of a second
+ */
+const initInterval = setInterval(() => {
+  const meetingWithSearchBox = document.querySelectorAll("[role=search]");
+  if (meetingWithSearchBox.length) {
+    init();
+    clearInterval(initInterval);
+  }
+}, 500);

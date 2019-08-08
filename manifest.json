@@ -1,0 +1,14 @@
+{
+  "name": "Google Calendar Time",
+  "version": "1.0",
+  "description": "Display time on each of your Google Calendar colors!",
+  "content_scripts": [
+    {
+      "matches": ["https://calendar.google.com/*"],
+      "run_at": "document_idle",
+      "js": ["index.js"]
+    }
+  ],
+  "permissions": ["activeTab"],
+  "manifest_version": 2
+}
