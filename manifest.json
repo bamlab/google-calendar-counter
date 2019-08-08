@@ -1,7 +1,8 @@
 {
-  "name": "Google Calendar Time",
   "version": "1.0",
-  "description": "Display time on each of your Google Calendar colors!",
+  "default_locale": "en",
+  "name": "__MSG_appName__",
+  "description": "__MSG_appDesc__",
   "content_scripts": [
     {
       "matches": ["https://calendar.google.com/*"],
