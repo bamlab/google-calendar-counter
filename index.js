@@ -31,6 +31,21 @@ const i18n = {
   }
 };
 
+/**
+ * Util for parsing string color to array of numbers
+ * ex: parseRGBColor('rgb(255, 136, 124)') => [255, 136, 124]
+ */
+
+const parseRGBColor = rgbColor =>
+  rgbColor
+    ? rgbColor
+        .replace("rgb(", "")
+        .replace(")", "")
+        .replace(" ", "")
+        .split(",")
+        .map(string => parseInt(string))
+    : parseRGBColor(NOT_ACCEPTED_YET_MEETINGS_COLOR);
+
 init = () => {
   /**
    * Build table with time details
@@ -90,6 +105,43 @@ init = () => {
       } (${(time / MINUTES_PER_DAY).toLocaleString(language, {
         maximumFractionDigits: 1
       })}${i18n.t("day")})`;
+
+    /**
+     * Merge colors (handling past events opacity).
+     * To get the color of the past events google does 255 - [(255 - color) * 0.3], i.e. 178.5 + 0.3 * color
+     */
+
+    const parsedColors = Object.keys(colorEvents).map(colorKey => ({
+      original: colorKey,
+      parsed: parseRGBColor(colorKey)
+    }));
+    const findPastEventsColor = color => {
+      return parsedColors.find(lookupColor => {
+        return (
+          color
+            .map(
+              (value, index) =>
+                Math.abs(value * 0.3 + 178.5 - lookupColor.parsed[index]) < 1.5
+            )
+            .reduce((acc, val) => acc && val) && color !== lookupColor.parsed
+        );
+      });
+    };
+
+    parsedColors.forEach(color => {
+      const pastEventsColor = findPastEventsColor(color.parsed);
+      if (
+        pastEventsColor &&
+        pastEventsColor.original !== NOT_ACCEPTED_YET_MEETINGS_COLOR &&
+        color.original !== NOT_ACCEPTED_YET_MEETINGS_COLOR
+      ) {
+        colorEvents[color.original] = [
+          ...colorEvents[color.original],
+          ...colorEvents[pastEventsColor.original]
+        ];
+        delete colorEvents[pastEventsColor.original];
+      }
+    });
 
     const colors = Object.keys(colorEvents).map(color => ({
       color: color,
