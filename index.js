@@ -143,46 +143,50 @@ init = () => {
       }
     });
 
-    const colors = Object.keys(colorEvents).map(color => ({
-      color: color,
-      time: formatTime(
-        colorEvents[color].reduce((time, event) => {
-          return time + getTimeFromEventSize(event);
-        }, 0)
-      )
-    }));
+    const colors = Object.keys(colorEvents).map(color => {
+      const timeInSeconds = colorEvents[color].reduce((time, event) => {
+        return time + getTimeFromEventSize(event);
+      }, 0);
+      return {
+        color: color,
+        timeInSeconds,
+        time: formatTime(timeInSeconds)
+      };
+    });
 
     /**
      * Add elements for each color
      */
-    colors.forEach(color => {
-      const item = document.createElement("li");
-      item.style.display = "flex";
-      item.style.alignItems = "center";
-      item.style.marginBottom = "12px";
+    colors
+      .sort((colorA, colorB) => colorB.timeInSeconds - colorA.timeInSeconds)
+      .forEach(color => {
+        const item = document.createElement("li");
+        item.style.display = "flex";
+        item.style.alignItems = "center";
+        item.style.marginBottom = "12px";
 
-      const colorDot = document.createElement("span");
-      colorDot.style.display = "inline-block";
-      colorDot.style.height = "20px";
-      colorDot.style.width = "20px";
-      colorDot.style.borderRadius = "20px";
-      colorDot.style.backgroundColor = color.color;
-      colorDot.style.marginRight = "8px";
-      if (color.color === NOT_ACCEPTED_YET_MEETINGS_COLOR)
-        colorDot.style.border = "1px solid black";
+        const colorDot = document.createElement("span");
+        colorDot.style.display = "inline-block";
+        colorDot.style.height = "20px";
+        colorDot.style.width = "20px";
+        colorDot.style.borderRadius = "20px";
+        colorDot.style.backgroundColor = color.color;
+        colorDot.style.marginRight = "8px";
+        if (color.color === NOT_ACCEPTED_YET_MEETINGS_COLOR)
+          colorDot.style.border = "1px solid black";
 
-      const text = document.createElement("span");
-      text.style.color = "#3c4043";
-      text.style.fontSize = "14px";
-      text.style.fontWeight = "400";
-      text.style.lineHeight = "16px";
-      text.style.fontFamily = "Roboto,Helvetica,Arial,sans-serif";
-      text.textContent = color.time;
+        const text = document.createElement("span");
+        text.style.color = "#3c4043";
+        text.style.fontSize = "14px";
+        text.style.fontWeight = "400";
+        text.style.lineHeight = "16px";
+        text.style.fontFamily = "Roboto,Helvetica,Arial,sans-serif";
+        text.textContent = color.time;
 
-      item.appendChild(colorDot);
-      item.appendChild(text);
-      table.appendChild(item);
-    });
+        item.appendChild(colorDot);
+        item.appendChild(text);
+        table.appendChild(item);
+      });
   };
 
   setInterval(computeData, 500);
