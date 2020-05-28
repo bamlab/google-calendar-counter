@@ -73,7 +73,7 @@ init = () => {
   /**
    * Insert table
    */
-  const meetingWithSearchBox = document.querySelectorAll("[role=search]")[0];
+  const meetingWithSearchBox = document.querySelectorAll("[role=search]")[1];
   meetingWithSearchBox.parentNode.insertBefore(title, meetingWithSearchBox);
   meetingWithSearchBox.parentNode.insertBefore(table, meetingWithSearchBox);
 
