@@ -73,9 +73,11 @@ init = () => {
   /**
    * Insert table
    */
-  const meetingWithSearchBox = document.querySelectorAll("[role=search]")[1];
-  meetingWithSearchBox.parentNode.insertBefore(title, meetingWithSearchBox);
-  meetingWithSearchBox.parentNode.insertBefore(table, meetingWithSearchBox);
+  const miniMonthNavigator = document.getElementById(
+    "drawerMiniMonthNavigator"
+  );
+  miniMonthNavigator.insertAdjacentElement("afterend", table);
+  miniMonthNavigator.insertAdjacentElement("afterend", title);
 
   const computeData = () => {
     table.textContent = "";
