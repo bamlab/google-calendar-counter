@@ -16,21 +16,21 @@ const language = navigator.language;
 const translations = {
   fr: {
     title: "Temps passé",
-    day: "j"
+    day: "j",
   },
   en: {
     title: "Time spent",
-    day: "d"
-  }
+    day: "d",
+  },
 };
 
 const i18n = {
-  t: key => {
+  t: (key) => {
     if (translations.hasOwnProperty(language)) {
       return translations[language][key];
     }
     return translations.en[key];
-  }
+  },
 };
 
 /**
@@ -38,14 +38,14 @@ const i18n = {
  * ex: parseRGBColor('rgb(255, 136, 124)') => [255, 136, 124]
  */
 
-const parseRGBColor = rgbColor =>
+const parseRGBColor = (rgbColor) =>
   rgbColor
     ? rgbColor
         .replace("rgb(", "")
         .replace(")", "")
         .replace(" ", "")
         .split(",")
-        .map(string => parseInt(string))
+        .map((string) => parseInt(string))
     : parseRGBColor(NOT_ACCEPTED_YET_MEETINGS_COLOR);
 
 const updateMinutesScale = (events) => {
@@ -108,16 +108,16 @@ init = () => {
       colorEvents[eventColor].push(event);
     });
 
-    const getTimeFromEventSize = event =>
+    const getTimeFromEventSize = (event) =>
       (parseInt(event.style.height.replace("px", "") || 0) +
         EVENT_BORDER_SIZE) *
       minuteHeight;
 
-    formatTime = time =>
+    formatTime = (time) =>
       `${time >= 60 ? `${Math.trunc(time / 60)}h` : ""}${
         time % 60 !== 0 ? `${time % 60}m` : ""
       } (${(time / MINUTES_PER_DAY).toLocaleString(language, {
-        maximumFractionDigits: 1
+        maximumFractionDigits: 1,
       })}${i18n.t("day")})`;
 
     /**
@@ -125,12 +125,12 @@ init = () => {
      * To get the color of the past events google does 255 - [(255 - color) * 0.3], i.e. 178.5 + 0.3 * color
      */
 
-    const parsedColors = Object.keys(colorEvents).map(colorKey => ({
+    const parsedColors = Object.keys(colorEvents).map((colorKey) => ({
       original: colorKey,
-      parsed: parseRGBColor(colorKey)
+      parsed: parseRGBColor(colorKey),
     }));
-    const findPastEventsColor = color => {
-      return parsedColors.find(lookupColor => {
+    const findPastEventsColor = (color) => {
+      return parsedColors.find((lookupColor) => {
         return (
           color
             .map(
@@ -142,7 +142,7 @@ init = () => {
       });
     };
 
-    parsedColors.forEach(color => {
+    parsedColors.forEach((color) => {
       const pastEventsColor = findPastEventsColor(color.parsed);
       if (
         pastEventsColor &&
@@ -151,20 +151,20 @@ init = () => {
       ) {
         colorEvents[color.original] = [
           ...colorEvents[color.original],
-          ...colorEvents[pastEventsColor.original]
+          ...colorEvents[pastEventsColor.original],
         ];
         delete colorEvents[pastEventsColor.original];
       }
     });
 
-    const colors = Object.keys(colorEvents).map(color => {
+    const colors = Object.keys(colorEvents).map((color) => {
       const timeInSeconds = colorEvents[color].reduce((time, event) => {
         return time + getTimeFromEventSize(event);
       }, 0);
       return {
         color: color,
         timeInSeconds,
-        time: formatTime(timeInSeconds)
+        time: formatTime(timeInSeconds),
       };
     });
 
@@ -173,7 +173,7 @@ init = () => {
      */
     colors
       .sort((colorA, colorB) => colorB.timeInSeconds - colorA.timeInSeconds)
-      .forEach(color => {
+      .forEach((color) => {
         const item = document.createElement("li");
         item.style.display = "flex";
         item.style.alignItems = "center";
