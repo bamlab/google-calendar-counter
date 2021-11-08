@@ -2,10 +2,12 @@
  * Constants
  */
 
-const MINUTE_HEIGHT_NORMAL = 30 / 24; // 24px is 30 minutes
+const MINUTE_HEIGHT_NORMAL = 30 / 24; // 24px is 30 minutes on normal screens
+const MINUTE_HEIGHT_SMALL = 30 / 20; // 20px is 30 minutes on small screens
 const EVENT_BORDER_SIZE = 2; // there is 2px of gap at the bottom of each event
 const MINUTES_PER_DAY = 7 * 60; // 7 hours in a day of work
 const NOT_ACCEPTED_YET_MEETINGS_COLOR = "rgb(255, 255, 255)";
+let minuteHeight = MINUTE_HEIGHT_NORMAL;
 
 /**
  * i18n utils
@@ -45,6 +47,14 @@ const parseRGBColor = rgbColor =>
         .split(",")
         .map(string => parseInt(string))
     : parseRGBColor(NOT_ACCEPTED_YET_MEETINGS_COLOR);
+
+const updateMinutesScale = (events) => {
+  if (window.innerHeight < 700) {
+    minuteHeight = MINUTE_HEIGHT_SMALL;
+  } else {
+    minuteHeight = MINUTE_HEIGHT_NORMALs;
+  }
+};
 
 init = () => {
   /**
@@ -88,7 +98,9 @@ init = () => {
 
     const colorEvents = {};
 
-    events.forEach(event => {
+    updateMinutesScale(events);
+
+    events.forEach((event) => {
       let eventColor =
         event.style.backgroundColor || NOT_ACCEPTED_YET_MEETINGS_COLOR;
 
@@ -99,7 +111,7 @@ init = () => {
     const getTimeFromEventSize = event =>
       (parseInt(event.style.height.replace("px", "") || 0) +
         EVENT_BORDER_SIZE) *
-      MINUTE_HEIGHT_NORMAL;
+      minuteHeight;
 
     formatTime = time =>
       `${time >= 60 ? `${Math.trunc(time / 60)}h` : ""}${
