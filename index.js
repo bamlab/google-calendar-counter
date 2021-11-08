@@ -52,7 +52,7 @@ const updateMinutesScale = (events) => {
   if (window.innerHeight < 700) {
     minuteHeight = MINUTE_HEIGHT_SMALL;
   } else {
-    minuteHeight = MINUTE_HEIGHT_NORMALs;
+    minuteHeight = MINUTE_HEIGHT_NORMAL;
   }
 };
 
