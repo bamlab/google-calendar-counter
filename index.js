@@ -2,7 +2,7 @@
  * Constants
  */
 
-const MINUTE_HEIGHT = 30 / 24; // 24px is 30 minutes
+const MINUTE_HEIGHT_NORMAL = 30 / 24; // 24px is 30 minutes
 const EVENT_BORDER_SIZE = 2; // there is 2px of gap at the bottom of each event
 const MINUTES_PER_DAY = 7 * 60; // 7 hours in a day of work
 const NOT_ACCEPTED_YET_MEETINGS_COLOR = "rgb(255, 255, 255)";
@@ -99,7 +99,7 @@ init = () => {
     const getTimeFromEventSize = event =>
       (parseInt(event.style.height.replace("px", "") || 0) +
         EVENT_BORDER_SIZE) *
-      MINUTE_HEIGHT;
+      MINUTE_HEIGHT_NORMAL;
 
     formatTime = time =>
       `${time >= 60 ? `${Math.trunc(time / 60)}h` : ""}${
